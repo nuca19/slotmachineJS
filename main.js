@@ -1,28 +1,42 @@
-
-
 const depbtn = document.querySelector('#depbtn')
-const betbtn = document.querySelector('#betbtn');
+const form = document.querySelector('form')
 let list = document.getElementById("myList");
+
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const lines = document.querySelector('#lines').value;
+    const betamount = document.querySelector('#betamount').value;
+    console.log(`Lines: ${lines}, betamount: ${betamount}`);
+
+    const nlines = parseFloat(lines);
+    if (isNaN(nlines) || nlines<1 || nlines>3 ){
+        console.log("Lines must be between 1-3");
+        return;
+    }
+
+    const nbetamount = parseFloat(betamount);
+    if (isNaN(nbetamount) || nbetamount<= 0 || nbetamount*lines > bal){
+        console.log("Invalid amount");
+        return;
+    }else{
+        bal -= nbetamount*lines;
+    }
+
+    const spinres = spin();
+    displayspin(spinres);
+
+    checkbet(spinres, lines, betamount);
+    console.log(bal);
+    update();
+
+});
+
 
 depbtn.addEventListener('click', function() {
     deposit();
     console.log(bal);
     update();
 });
-
-betbtn.addEventListener('click', function () {
-    console.log(bal);
-    const lines = getLines();
-    const bet = getbet(lines);
-    const spinres = spin();
-
-    displayspin(spinres);
-    checkbet(spinres, lines, bet);
-
-    console.log(bal);
-    update();
-
-  });
 
 const update = () => {
     document.getElementById("balance").innerHTML = "balance: " + bal + "$";
@@ -33,11 +47,9 @@ const displayspin = (spin) => {
         list.removeChild(list.firstChild)
     }
 
-    for (let i=1; i<4; i++){
-        const l = spin;
-        const c = l.slice(i*3-3, i*3);
+    for (reel of spin){
         let li = document.createElement('li');
-        li.innerText = c[0]+c[1]+c[2];
+        li.innerText = reel[0] +" "+ reel[1]+" "+reel[2];
         list.appendChild(li);
     }
 }
@@ -49,14 +61,16 @@ const ROWS = 3;
 const COLS = 3;
 
 const SYMBOLS_COUNT = {
+    A : 2,
+    B : 4,
     C : 6,
-    D : 10
+    D : 8
 }
 const SYMBOLS_VALUES = {
-    "A" : 5,
-    "B" : 4,
-    "C" : 3,
-    "D" : 2
+    A : 20,
+    B : 12,
+    C : 7,
+    D : 4
 }
 
 let bal = 0;
@@ -73,7 +87,7 @@ const deposit = () => {
     }
 };
 
-const getLines = () => {
+const getLines = () => { //not used
     while(true){
         const lines = prompt("Enter number of lines to bet on (1-3): ");
         const nlines = parseFloat(lines);
@@ -85,7 +99,7 @@ const getLines = () => {
     }
 }
 
-const getbet = (lines) => {
+const getbet = (lines) => { //not used
     while(true){
         const betamount = prompt("Enter amount to bet per line: ");
         const nbetamount = parseFloat(betamount);
@@ -107,14 +121,25 @@ const spin = () => {
     }
 
     const res = [];
-    for (let i = 0; i<9; i++){
-        const randomIndex = Math.floor(Math.random() * symbols.length);
-        res.push(symbols[randomIndex]);
-        symbols.splice(randomIndex, 1);
+    for (let i = 0; i<COLS; i++){
+        res.push([]);
+        const reelsymbols = [...symbols];
+        for (let j = 0; j<ROWS; j++){
+            const randomIndex = Math.floor(Math.random() * reelsymbols.length);
+            res[i].push(reelsymbols[randomIndex]);
+            reelsymbols.splice(randomIndex, 1);
+        }
     }
 
-    console.log(res);
-    return res;
+    const tranres = []; //transpose res
+    for (let i = 0; i<ROWS; i++){
+        tranres.push([]);
+        for (let j = 0; j<COLS; j++){
+            tranres[i].push(res[j][i]);
+        }
+    }
+
+    return tranres;
 
 }
 
@@ -124,12 +149,9 @@ const checkbet = (spinres, lines, betamount) => {
     let correctlines = 0;
     const correctsymbols = [];
 
-    for (let i=1; i<4; i++){
-        const l = spinres;
-        const c = l.slice(i*3-3, i*3);
-        console.log(c);
-        if (allEqual(c)){
-            correctsymbols.push(c[0]);
+    for (reel of spinres){
+        if (allEqual(reel)){
+            correctsymbols.push(reel[0]);
             correctlines += 1;
         }
     }
@@ -148,9 +170,6 @@ const checkbet = (spinres, lines, betamount) => {
         lineswon = correctlines;
     }
 
-    console.log(lineswon);
-    console.log(correctsymbols);
-
     if (lineswon > 0){
         let win = 0;
         for (const s of correctsymbols){
@@ -160,7 +179,7 @@ const checkbet = (spinres, lines, betamount) => {
         document.getElementById("result").innerHTML = "You won " + win + "$";
     }
     else{
-        document.getElementById("result").innerHTML = "You lost";
+        document.getElementById("result").innerHTML = "You lost " + "-"+ betamount*lines + "$";
     }
     return 0;
 }

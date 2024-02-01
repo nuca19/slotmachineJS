@@ -1,18 +1,45 @@
 <!DOCTYPE html>
 <html>
-<body>
+    <head>
+        <title>Slot Machine</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+    <body>
 
-<h2>JavaScript Slot</h2>
+        <div class="slot-container">
+            <div class="wrapper">
+            <div class="title"><span> SLOT MACHINE </span></div>
+            <h3>
+                <div>
+                    <p id="balance">balance: 0$</p>
+                    <button id="depbtn">Deposit</button>
+                </div>
+            </h3>
+                <h2>
+                    <div class="centert">
+                        <ul id="myList">
+                            <li>- - -</li>
+                            <li>- - -</li>
+                            <li>- - -</li>
+                        </ul>
+                    </div>
+                </h2>
+                <div class="centert">
+                    <p id="result"></p>
+                </div>
+                <div class="centert">
+                    <form>
+                        <input id="lines" type="text" placeholder="Number of lines (2-3)" required />
+                        <input id="betamount" type="text" placeholder="Bet amount per line" required />
+                        <p></p>
+                        <button type="submit">Bet</button>
+                    </form>
+            </div>
+            </div>
+        </div>
 
-<button id="depbtn">Deposit</button>
-<p id="balance">balance: 0$</p>
-<button id="betbtn">Bet</button>
-<ul id="myList"></ul>
+    </body>
 
-<p id="result"></p>
-
-
-</body>
-<script src="main.js"></script>
+    <script src="main.js"></script>
 
 </html>
